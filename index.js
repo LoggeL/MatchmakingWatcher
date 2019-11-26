@@ -5,7 +5,11 @@ const fs = require('fs')
 const axios = require('axios')
 const { rgToken, discordToken } = require('./secrets.json')
 
+let users = require('./users.json')
+let recents = []
+
 const client = new Discord.Client()
+const prefix = '!!'
 
 client.login(discordToken)
 
@@ -15,6 +19,56 @@ const kayn = Kayn(rgToken)({
 
 client.on('ready', async () => {
     console.log(client.user.tag, 'is ready')
+})
+
+client.on('message', async message => {
+    if (!message.content.startsWith(prefix)) return
+    let args = message.content.slice(prefix.length).split(/\s+/)
+    const cmd = args.shift()
+    if (cmd == "add") {
+        if (users[message.author.id] == args.join(' ')) return message.reply('I\'m already monitoring you')
+        try {
+            const summoner = await kayn.Summoner.by.name(args.join(' '))
+            message.reply(`I will monitor the account ${summoner.name}\nLevel: ${summoner.summonerLevel}`)
+            users[message.author.id] = args.join(' ')
+        }
+        catch (e) {
+            message.reply('Couldn\'t find the account ' + args.join(' '))
+        }
+    }
+    else if (cmd == "remove") {
+        if (users[message.author.id] == null) return message.reply('I\'m not mointoring your account')
+        message.reply('I will no longer monitor the account ' + users[message.author.id])
+        users[message.author.id] = null
+    }
+    else {
+        return
+    }
+    console.log(cmd, args.join(' '))
+    fs.writeFileSync('users.json', JSON.stringify(users))
+})
+
+client.on('raw', async rawPacket => {
+    if (rawPacket.t !== 'PRESENCE_UPDATE') return
+    const userID = rawPacket.d.user.id
+    const activity = rawPacket.d.activities.find(a => a.name === "League of Legends")
+
+    if (!activity) return
+    //client.on('presenceUpdate', async (oldPresence, newPresence) => {
+    if (!users[userID]) return
+    console.log('presenceUpdate check 1')
+
+    if (!activity || !activity.timestamps) return
+    console.log('presenceUpdate check 2')
+
+    if (activity.name != 'League of Legends' || activity.state != 'In Game') return
+    console.log('presenceUpdate check 3')
+
+    if (new Date() - activity.timestamps.start > 60000) return
+    console.log('presenceUpdate check 4')
+
+
+    console.log("Fetching data for " + users[userID])
 
     const versions = await kayn.DDragon.Version.list()
     const version = versions[0]
@@ -22,12 +76,26 @@ client.on('ready', async () => {
     const response = await axios("https://raw.githubusercontent.com/CommunityDragon/Data/master/patches.json", { json: true })
     //const season = response.data.patches[response.data.patches.length - 1].season
 
-    const summonerName = 'Faabiann'
+    const summonerName = users[userID]
     const champions = (await kayn.DDragon.Champion.listDataByIdWithParentAsId())
         .data
 
     const summoner = await kayn.Summoner.by.name(summonerName)
-    const game = await kayn.CurrentGame.by.summonerID(summoner.id)
+    let game = {}
+    try {
+        game = await kayn.CurrentGame.by.summonerID(summoner.id)
+    }
+    catch (e) {
+        console.error(e)
+    }
+
+    if (!game.gameId || recents.includes(game.gameId)) return
+    recents.push(game.gameId)
+    setTimeout(() => {
+        recents.splice(recents.indexOf(game.gameId), 1)
+        console.log(recents)
+    }, 60000)
+
     let allyTeam = []
     let enemyTeam = []
     //console.log(game)
@@ -159,7 +227,7 @@ client.on('ready', async () => {
             ctx.fillText('Unranked', 435, i * 49 + 82)
         }
     }
-    const attachment = new Discord.Attachment(canvas.toBuffer(), 'image.png')
+    const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'image.png')
 
     client.channels.get('647831066228293632').send(attachment)
 })
