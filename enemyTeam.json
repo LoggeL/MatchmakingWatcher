@@ -1,1 +1,48 @@
-[{"tier":"SILVER","rank":"II","wins":15,"losses":18,"name":"ISOTUGE","champion":"Cassiopeia","totalGames":2},{"tier":"GOLD","rank":"II","wins":105,"losses":101,"name":"Tottoro","champion":"Rengar","totalGames":7},{"tier":"DIAMOND","rank":"IV","wins":30,"losses":13,"name":"Leaffy","champion":"Azir","totalGames":45},{"tier":"PLATINUM","rank":"IV","wins":35,"losses":26,"name":"PromQueenFelix","champion":"Sylas","totalGames":51},{"name":"Anacharox","champion":"Darius","totalGames":33}]
+[
+    {
+        "tier": "SILVER",
+        "rank": "II",
+        "wins": 15,
+        "losses": 18,
+        "name": "ISOTUGE",
+        "champion": "Cassiopeia",
+        "totalGames": 2,
+        "lp": 69
+    },
+    {
+        "tier": "GOLD",
+        "rank": "II",
+        "wins": 105,
+        "losses": 101,
+        "name": "Tottoro",
+        "champion": "Rengar",
+        "totalGames": 7,
+        "lp": 69
+    },
+    {
+        "tier": "DIAMOND",
+        "rank": "IV",
+        "wins": 30,
+        "losses": 13,
+        "name": "Leaffy",
+        "champion": "Azir",
+        "totalGames": 45,
+        "lp": 69
+    },
+    {
+        "tier": "PLATINUM",
+        "rank": "IV",
+        "wins": 35,
+        "losses": 26,
+        "name": "PromQueenFelix",
+        "champion": "Sylas",
+        "totalGames": 51,
+        "lp": 69
+    },
+    {
+        "name": "Anacharox",
+        "champion": "Darius",
+        "totalGames": 33,
+        "lp": 69
+    }
+]
