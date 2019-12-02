@@ -209,6 +209,7 @@ client.on('raw', async rawPacket => {
         ctx.arc(45, i * 49 + 70, 20, 0, 2 * Math.PI);
         ctx.stroke();
 
+        /*
         ctx.font = '20px "Roboto"'
         ctx.fillStyle = '#5cb85c'
         ctx.fillText('Ranked Wins', 90, 33)
@@ -218,6 +219,7 @@ client.on('raw', async rawPacket => {
 
         ctx.fillStyle = '#ffffff'
         ctx.fillText('Ranked games with champ', 410, 33)
+        */
 
         if (allyTeam[i].rank) {
             eloPic = await Canvas.loadImage(
