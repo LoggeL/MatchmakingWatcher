@@ -20,6 +20,7 @@ const kayn = Kayn(rgToken)({
 
 client.on('ready', async () => {
     console.log(client.user.tag, 'is ready')
+    client.channels.get('647831066228293632').send('I just restarted!')
 })
 
 client.on('message', async message => {
@@ -77,6 +78,7 @@ client.on('raw', async rawPacket => {
     console.log("Fetching data for " + users[userID])
 
     const summonerName = users[userID]
+    let activeUsers
     const response = await axios("https://raw.githubusercontent.com/CommunityDragon/Data/master/patches.json", { json: true })
     const season = response.data.patches[response.data.patches.length - 1].season
     //const summonerName = 'DeliriousPlayer'
@@ -195,7 +197,13 @@ client.on('raw', async rawPacket => {
         // Green outline
         ctx.strokeStyle = '#5cb85c'
         if (!recent) recent = recents.find(r => r.gameId == game.gameId)
-        if (recent.sums.includes(allyTeam[i].name)) ctx.strokeStyle = '#ffff00'
+        for (discordId in users) {
+            if (users[discordId] == allyTeam[i].name) {
+                ctx.strokeStyle = '#ffff00'
+                activeUsers.push(discordId)
+            }
+        }
+
 
         ctx.beginPath();
         ctx.arc(45, i * 49 + 70, 20, 0, 2 * Math.PI);
@@ -331,8 +339,9 @@ client.on('raw', async rawPacket => {
 
 
 
+    let mentionString = activeUsers.map(a => '<@' + u + '>').join(' ')
     const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'image.png')
-    client.channels.get('647831066228293632').send(attachment)
+    client.channels.get('647831066228293632').send(mentionString, { attachment })
 })
 
 process.on('unhandledRejection', (reason, p) => {
