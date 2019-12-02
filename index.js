@@ -78,7 +78,6 @@ client.on('raw', async rawPacket => {
     console.log("Fetching data for " + users[userID])
 
     const summonerName = users[userID]
-    let activeUsers
     const response = await axios("https://raw.githubusercontent.com/CommunityDragon/Data/master/patches.json", { json: true })
     const season = response.data.patches[response.data.patches.length - 1].season
     //const summonerName = 'DeliriousPlayer'
@@ -182,7 +181,7 @@ client.on('raw', async rawPacket => {
 
     const background = await Canvas.loadImage('./scoreboardatlas.png')
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
-
+    let activeUsers = []
     let heroPic, eloPic
 
     // Ally
@@ -339,11 +338,15 @@ client.on('raw', async rawPacket => {
     }
     fs.writeFileSync('img.png', canvas.toBuffer())
 
+    let mentionString = activeUsers.map(a => '<@' + a + '>').join(' ')
+    const attachment = new Discord.MessageAttachment()
 
-
-    let mentionString = activeUsers.map(a => '<@' + u + '>').join(' ')
-    const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'image.png')
-    client.channels.get('647831066228293632').send(mentionString, { attachment })
+    client.channels.get('647831066228293632').send(mentionString, {
+        files: [{
+            attachment: canvas.toBuffer(),
+            name: 'image.png'
+        }]
+    })
 })
 
 process.on('unhandledRejection', (reason, p) => {
