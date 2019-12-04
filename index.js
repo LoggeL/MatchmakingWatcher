@@ -71,7 +71,7 @@ client.on('raw', async rawPacket => {
     if (activity.name != 'League of Legends' || activity.state != 'In Game') return
     console.log('presenceUpdate check 3')
 
-    if (new Date() - activity.timestamps.start > 60000) return
+    if (new Date() - activity.timestamps.start > 10000) return
     console.log('presenceUpdate check 4')
 
 
@@ -91,22 +91,15 @@ client.on('raw', async rawPacket => {
         game = await kayn.CurrentGame.by.summonerID(summoner.id)
     }
     catch (e) {
-        console.error(e)
+        return console.error(e)
     }
 
     if (!game.gameId || recents.includes(game.gameId)) return
 
-    let recent = recents.find(r => r.gameId == game.gameId)
-    const particpantSummoner = game.participants.find(p => p.summonerName == summonerName)
-    if (recent) {
-        recent.sums.push(particpantSummoner.summonerName)
-        return
-    }
-    recents.push({ gameId: game.gameId, sums: [particpantSummoner.summonerName] })
-    setTimeout(() => {
-        recents.splice(recents.indexOf(recent), 1)
-        console.log(recents)
-    }, 60000)
+    let recent = recents.includes(game.gameId)
+    if (recent) return
+    recent.push()
+    recents.push(game.gameId)
 
     let allyTeam = []
     let enemyTeam = []
@@ -195,7 +188,6 @@ client.on('raw', async rawPacket => {
 
         // Green outline
         ctx.strokeStyle = '#5cb85c'
-        if (!recent) recent = recents.find(r => r.gameId == game.gameId)
         for (discordId in users) {
             if (users[discordId] == allyTeam[i].name) {
                 ctx.strokeStyle = '#ffff00'
