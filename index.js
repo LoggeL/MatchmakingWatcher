@@ -95,10 +95,6 @@ client.on('raw', async rawPacket => {
     }
 
     if (!game.gameId || recents.includes(game.gameId)) return
-
-    let recent = recents.includes(game.gameId)
-    if (recent) return
-    recent.push()
     recents.push(game.gameId)
 
     let allyTeam = []
