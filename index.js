@@ -20,7 +20,6 @@ const kayn = Kayn(rgToken)({
 
 client.on('ready', async () => {
     console.log(client.user.tag, 'is ready')
-    client.channels.get('647831066228293632').send('I just restarted!')
 })
 
 client.on('message', async message => {
@@ -133,7 +132,6 @@ client.on('raw', async rawPacket => {
                 filteredMatches = matches.matches.filter(m => m.season == season && m.champion == game.participants[i].championId)
                 config.beginIndex = config.beginIndex + 100
                 collector = collector + filteredMatches.length
-                console.log(collector)
                 if (filteredMatches.length < 100) break
             }
             while (filteredMatches.length > 100)
@@ -184,6 +182,7 @@ client.on('raw', async rawPacket => {
 
         // Green outline
         ctx.strokeStyle = '#5cb85c'
+        ctx.lineWidth = 2
         for (discordId in users) {
             if (users[discordId] == allyTeam[i].name) {
                 ctx.strokeStyle = '#ffff00'
