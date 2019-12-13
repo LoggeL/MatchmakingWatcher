@@ -9,6 +9,8 @@ Canvas.registerFont("Roboto-Regular.ttf", { family: 'Roboto' })
 let users = require('./users.json')
 let recents = []
 
+const gameStrings = ['In Game', 'Im Spiel', 'En jeu', 'Oyunda']
+
 const client = new Discord.Client()
 const prefix = '!!'
 client.login(discordToken)
@@ -67,7 +69,7 @@ client.on('raw', async rawPacket => {
     if (!activity || !activity.timestamps) return
     console.log('presenceUpdate check 2')
 
-    if (activity.name != 'League of Legends' || activity.state != 'In Game') return
+    if (activity.name != 'League of Legends' || !gameStrings.includes(activity.state)) return
     console.log('presenceUpdate check 3')
 
     if (new Date() - activity.timestamps.start > 10000) return
