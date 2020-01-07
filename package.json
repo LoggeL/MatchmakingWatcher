@@ -1,0 +1,19 @@
+{
+  "name": "oplogge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0",
+    "canvas": "^2.6.0",
+    "cli-table2": "^0.2.0",
+    "discord.js": "github:discordjs/discord.js",
+    "jimp": "^0.9.3",
+    "kayn": "^0.10.2"
+  }
+}
