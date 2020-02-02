@@ -3,10 +3,12 @@ const Discord = require('discord.js')
 const Canvas = require('canvas')
 const fs = require('fs')
 const axios = require('axios')
-const { rgToken, discordToken } = require('./secrets.json')
-Canvas.registerFont("Roboto-Regular.ttf", { family: 'Roboto' })
+const { rgToken, discordToken } = require(__dirname + '/secrets.json')
+Canvas.registerFont(__dirname + "/Roboto-Regular.ttf", { family: 'Roboto' })
 
-let users = require('./users.json')
+require(__dirname + '/downloadImages.js')
+
+let users = require(__dirname + '/users.json')
 let recents = []
 
 const gameStrings = ['In Game', 'Im Spiel', 'En jeu', 'Oyunda']
@@ -79,7 +81,6 @@ client.on('raw', async rawPacket => {
     console.log("Fetching data for " + users[userID])
 
     try {
-
         const summonerName = users[userID]
         const response = await axios("https://raw.githubusercontent.com/CommunityDragon/Data/master/patches.json", { json: true })
         const season = response.data.patches[response.data.patches.length - 1].season
@@ -187,8 +188,8 @@ client.on('raw', async rawPacket => {
         for (i = 0; i < allyTeam.length; i++) {
             console.log('Rendering row', i)
 
-            heroPic = await Canvas.loadImage(
-                `champions/${allyTeam[i].champion}.png`
+            heroPic = await Canvas.loadImage(__dirname +
+                `/champions/${allyTeam[i].champion}.png`
             )
             ctx.drawImage(heroPic, 25, i * 49 + 50, 40, 40)
 
@@ -221,7 +222,7 @@ client.on('raw', async rawPacket => {
 
             if (allyTeam[i].rank) {
                 eloPic = await Canvas.loadImage(
-                    `./ranked-emblems/${allyTeam[i].tier}.png`
+                    __dirname + `/ranked-emblems/${allyTeam[i].tier}.png`
                 )
 
                 ctx.drawImage(eloPic, 515 - 350, i * 49 + 48, 45, 45)
@@ -269,8 +270,8 @@ client.on('raw', async rawPacket => {
         // Enemy
         for (i = 0; i < enemyTeam.length; i++) {
 
-            heroPic = await Canvas.loadImage(
-                `champions/${enemyTeam[i].champion}.png`
+            heroPic = await Canvas.loadImage(__dirname +
+                `/champions/${enemyTeam[i].champion}.png`
             )
             ctx.drawImage(heroPic, 375, i * 49 + 50, 40, 40)
 
@@ -283,7 +284,7 @@ client.on('raw', async rawPacket => {
 
             if (enemyTeam[i].rank) {
                 eloPic = await Canvas.loadImage(
-                    `./ranked-emblems/${enemyTeam[i].tier}.png`
+                    __dirname + `/ranked-emblems/${enemyTeam[i].tier}.png`
                 )
 
                 ctx.drawImage(eloPic, 515, i * 49 + 48, 45, 45)
@@ -345,6 +346,8 @@ client.on('raw', async rawPacket => {
                 attachment: canvas.toBuffer(),
                 name: 'image.png'
             }]
+        }).then(msg => {
+            console.log("Message Sent!")
         })
     }
     catch (e) {
