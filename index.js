@@ -8,7 +8,7 @@ Canvas.registerFont(__dirname + "/Roboto-Regular.ttf", { family: 'Roboto' })
 
 require(__dirname + '/downloadImages.js')
 
-let users = require(__dirname + '/users.json')
+let users = require(__dirname + '/../users.json')
 let recents = []
 
 const gameStrings = ['In Game', 'Im Spiel', 'En jeu', 'Oyunda']
@@ -50,7 +50,7 @@ client.on('message', async message => {
         return
     }
     console.log(cmd, args.join(' '))
-    fs.writeFileSync('users.json', JSON.stringify(users))
+    fs.writeFileSync(__dirname + '/../users.json', JSON.stringify(users))
 })
 /*
 client.on('message', async m => {
