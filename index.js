@@ -351,7 +351,8 @@ client.on('raw', async rawPacket => {
         })
     }
     catch (e) {
-        client.channels.get('647831066228293632').send("Loggo you fucked up bcs:\n`" + e + '`')
+        console.error("Error", e)
+        client.channels.get('647831066228293632').send("Loggo you fucked up bcs:\n`" + require('util').inspect(e) + '`')
     }
 })
 
