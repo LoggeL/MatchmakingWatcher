@@ -6,10 +6,9 @@ const axios = require('axios')
 const { rgToken, discordToken } = require(__dirname + '/secrets.json')
 Canvas.registerFont(__dirname + "/Roboto-Regular.ttf", { family: 'Roboto' })
 
-require(__dirname + '/downloadImages.js')
-
 let users = require(__dirname + '/../users.json')
 let recents = []
+let seasonTimestamp
 
 const gameStrings = ['In Game', 'Im Spiel', 'En jeu', 'Oyunda']
 
@@ -21,9 +20,21 @@ const kayn = Kayn(rgToken)({
     region: REGIONS.EUROPE_WEST,
 })
 
+async function getSeasonTimestamp() {
+    require(__dirname + '/downloadImages.js')
+
+    const response = await axios("https://raw.githubusercontent.com/CommunityDragon/Data/master/patches.json", { json: true })
+    const lastPatch = response.data.patches[response.data.patches.length - 1]
+    const patchPrefix = lastPatch.name.split('.')[0]
+    seasonTimestamp = response.data.patches.find(p => p.name.startsWith(patchPrefix)).start * 1000
+}
 
 client.on('ready', async () => {
     console.log(client.user.tag, 'is ready')
+
+    getSeasonTimestamp()
+
+    setInterval(getSeasonTimestamp, 24 * 3600 * 1000)
 })
 
 client.on('message', async message => {
@@ -55,16 +66,16 @@ client.on('message', async message => {
 /*
 client.on('message', async m => {
     if (!m.content.startsWith('test')) return
-    /*    
 })
-   */
+*/
+
 client.on('raw', async rawPacket => {
     if (rawPacket.t !== 'PRESENCE_UPDATE') return
     const userID = rawPacket.d.user.id
     const activity = rawPacket.d.activities.find(a => a.name === "League of Legends")
 
     if (!activity) return
-    //client.on('presenceUpdate', async (oldPresence, newPresence) => {
+
     if (!users[userID]) return
     console.log('presenceUpdate check 1')
 
@@ -76,15 +87,13 @@ client.on('raw', async rawPacket => {
 
     if (new Date() - activity.timestamps.start > 10000) return
     console.log('presenceUpdate check 4')
-
-
+    //userID = '187543604946796544'
     console.log("Fetching data for " + users[userID])
 
     try {
         const summonerName = users[userID]
-        const response = await axios("https://raw.githubusercontent.com/CommunityDragon/Data/master/patches.json", { json: true })
-        const season = response.data.patches[response.data.patches.length - 1].season
-        //const summonerName = 'DeliriousPlayer'
+        //const summonerName = 'FocuZ Legendary'
+
 
         const champions = (await kayn.DDragon.Champion.listDataByIdWithParentAsId())
             .data
@@ -133,7 +142,7 @@ client.on('raw', async rawPacket => {
             let config = {
                 queue: 420,
                 champion: game.participants[i].championId,
-                beginIndex: 0
+                beginIndex: 0,
                 //season: season
             }
             const summ = await kayn.Summoner.by.id(game.participants[i].summonerId)
@@ -142,7 +151,7 @@ client.on('raw', async rawPacket => {
                 let filteredMatches
                 do {
                     let matches = await kayn.Matchlist.by.accountID(summ.accountId).query(config)
-                    filteredMatches = matches.matches.filter(m => m.season == season && m.champion == game.participants[i].championId)
+                    filteredMatches = matches.matches.filter(m => m.timestamp > seasonTimestamp && m.champion == game.participants[i].championId)
                     config.beginIndex = config.beginIndex + 100
                     collector = collector + filteredMatches.length
                     if (filteredMatches.length < 100) break
@@ -341,7 +350,7 @@ client.on('raw', async rawPacket => {
         let mentionString = activeUsers.map(a => '<@' + a + '>').join(' ')
         const attachment = new Discord.MessageAttachment()
 
-        client.channels.get('647831066228293632').send(mentionString, {
+        client.channels.cache.get('647831066228293632').send(mentionString, {
             files: [{
                 attachment: canvas.toBuffer(),
                 name: 'image.png'
@@ -352,7 +361,7 @@ client.on('raw', async rawPacket => {
     }
     catch (e) {
         console.error("Error", e)
-        client.channels.get('647831066228293632').send("Loggo you fucked up bcs:\n`" + require('util').inspect(e) + '`')
+        client.channels.cache.get('647831066228293632').send("Loggo you fucked up bcs:\n`" + require('util').inspect(e) + '`')
     }
 })
 
