@@ -2,13 +2,14 @@ const { Kayn, REGIONS } = require('kayn')
 const Discord = require('discord.js')
 const Canvas = require('canvas')
 const fs = require('fs')
-const axios = require('axios')
+const fetch = require('node-fetch')
 const { rgToken, discordToken } = require(__dirname + '/secrets.json')
 Canvas.registerFont(__dirname + "/Roboto-Regular.ttf", { family: 'Roboto' })
 
 let users = require(__dirname + '/../users.json')
 let recents = []
 let seasonTimestamp
+let champions
 
 const gameStrings = ['In Game', 'Im Spiel', 'En jeu', 'Oyunda']
 
@@ -20,13 +21,23 @@ const kayn = Kayn(rgToken)({
     region: REGIONS.EUROPE_WEST,
 })
 
+
 async function getSeasonTimestamp() {
     require(__dirname + '/downloadImages.js')
 
-    const response = await axios("https://raw.githubusercontent.com/CommunityDragon/Data/master/patches.json", { json: true })
-    const lastPatch = response.data.patches[response.data.patches.length - 1]
+    const request = await fetch("https://raw.githubusercontent.com/CommunityDragon/Data/master/patches.json")
+    const response = await request.json()
+    const lastPatch = response.patches[response.patches.length - 1]
+    console.log(lastPatch)
     const patchPrefix = lastPatch.name.split('.')[0]
-    seasonTimestamp = response.data.patches.find(p => p.name.startsWith(patchPrefix)).start * 1000
+    seasonTimestamp = response.patches.find(p => p.name.startsWith(patchPrefix)).start * 1000
+
+    fetch('https://ddragon.leagueoflegends.com/api/versions.json').then(res => res.json()).then(
+        versions =>
+            fetch(`https://ddragon.leagueoflegends.com/cdn/${versions[0]}/data/en_US/champion.json`).then(res => res.json()).then(
+                championData => champions = Object.values(championData.data)
+            )
+    )
 }
 
 client.on('ready', async () => {
@@ -95,8 +106,8 @@ client.on('raw', async rawPacket => {
         //const summonerName = 'FocuZ Legendary'
 
 
-        const champions = (await kayn.DDragon.Champion.listDataByIdWithParentAsId())
-            .data
+        //const champions = (await kayn.DDragon.Champion.listDataByIdWithParentAsId())
+        //    .data
 
         const summoner = await kayn.Summoner.by.name(summonerName)
         let game = {}
@@ -137,7 +148,7 @@ client.on('raw', async rawPacket => {
                 team.lp = Solo5x5.leaguePoints || 0
             }
             team.name = game.participants[i].summonerName
-            team.champion = champions[game.participants[i].championId].key
+            team.champion = champions.find(c => c.key == game.participants[i].championId).id
 
             let config = {
                 queue: 420,
