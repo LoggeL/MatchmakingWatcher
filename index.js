@@ -30,6 +30,7 @@ client.on('raw', async rawPacket => {
     if (!activity || !activity.timestamps) return
     if (new Date() - activity.timestamps.start > 10000) return
     if (activity.name != 'League of Legends' || !gameStrings.includes(activity.state)) return
+    if (activity.details.includes('Teamfight Tactics')) return
     if (recentGames.includes(player)) return
     console.log("Fetching data for " + player, activity)
 
@@ -223,7 +224,7 @@ client.on('raw', async rawPacket => {
             }
         }
 
-        fs.writeFileSync('img.png', canvas.toBuffer())
+        // fs.writeFileSync('img.png', canvas.toBuffer())
 
         client.channels.fetch('647831066228293632').then(c =>
             c.send({
