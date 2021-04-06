@@ -35,7 +35,7 @@ client.on('raw', async rawPacket => {
     console.log("Fetching data for " + player, activity)
 
 
-    JSDOM.fromURL(`https://porofessor.gg/partial/live-partial/${server}/${player}`).then(async dom => {
+    JSDOM.fromURL(`https://porofessor.gg/partial/live-partial/${server}/${encodeURIComponent(player)}`).then(async dom => {
         //JSDOM.fromFile('prof.html').then(async dom => {
 
         const doc = dom.window.document
