@@ -61,8 +61,6 @@ client.on('raw', async rawPacket => {
         const rankedGamesRaw = [...doc.querySelectorAll('.rankingsBox.canExpand .imgFlex:first-of-type .oneLiner')].map(e => e.textContent.trim().split('  ').filter(e => e.length > 0 && e != "\n"))
         const mainRoles = [...doc.querySelectorAll('.rolesBox .highlight')].map(e => e.textContent.trim())
         const kda = [...doc.querySelectorAll('div.championsBoxContainer > div > div.imgFlex > div.txt > div.content > div:nth-child(1)')].map(e => e.textContent.replace(/\s/g, ''))
-        // const secondaryRankingsBool = [...doc.querySelectorAll('.rankingOtherRankings')].map(e => e.textContent.trim().length > 0)
-        // const secondaryRankings = [...doc.querySelectorAll('.rankingOtherRankings .relative img')].map(e => e.title)
         if (recentGames.includes(users[userID])) return
         recentGames = [...recentGames, ...playerNames]
         setTimeout(() => {
