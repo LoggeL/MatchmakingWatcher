@@ -7,9 +7,11 @@ const jimp = require('jimp')
     let resp = await fetch('https://ddragon.leagueoflegends.com/api/versions.json')
     const versions = await resp.json()
     const version = versions[0]
+
     resp = await fetch('https://ddragon.leagueoflegends.com/cdn/' + version + '/data/en_US/champion.json')
     const champions = await resp.json()
     const names = Object.keys(champions.data)
+
     let promises = []
     for (i in names) {
         const name = names[i]
