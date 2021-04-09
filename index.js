@@ -79,7 +79,7 @@ client.on('raw', async rawPacket => {
         }
 
         const playerIndex = playerNames.indexOf(player)
-        const premades = [...doc.querySelectorAll('.premadeTag ')].map(e => ([e.parentNode.children[0].textContent.trim(), e.textContent.trim()]))
+        const premades = [...doc.querySelectorAll('.premadeTag ')].map(e => ([e.parentNode.children[2] ? e.parentNode.children[1].textContent.trim() : e.parentNode.children[0].textContent.trim(), e.textContent.trim()]))
 
         const premadeColors = ["#00ff00", '#ff00ff', '#ffff00', '#00ffff', '#ff00ff', '#ffffff']
         let premadeMapper = {}
