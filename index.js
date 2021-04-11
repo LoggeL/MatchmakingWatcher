@@ -7,7 +7,7 @@ const fetch = require('node-fetch')
 let users = require('./users.json')
 const config = require('./secrets.json')
 
-const roboto = Canvas.Font('Roboto', fontFile('Roboto-Regular.ttf'));
+Canvas.registerFont('Roboto-Regular.ttf', { family: 'Roboto' })
 
 const { JSDOM } = jsdom;
 const client = new Discord.Client({ intents: ['GUILD_PRESENCES', 'GUILD_MESSAGES'] });
@@ -95,7 +95,6 @@ client.on('raw', async rawPacket => {
 
         ctx.textAlign = "center"
         ctx.textBaseline = "middle";
-        ctx.addFont(roboto)
 
         const background = await Canvas.loadImage('./scoreboardatlas.png')
         ctx.drawImage(background, 0, 0, canvas.width, canvas.height)
