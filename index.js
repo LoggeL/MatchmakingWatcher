@@ -40,7 +40,7 @@ client.on('raw', async rawPacket => {
     JSDOM.fromURL(`https://porofessor.gg/partial/live-partial/${server}/${encodeURIComponent(player)}`).then(async dom => {
         //JSDOM.fromFile('prof.html').then(async dom => {
 
-        const doc = dom.window.document
+        const document = dom.window.document
 
         const championsJSON = require('./champions.json')
         let championMapper = {}
@@ -52,17 +52,17 @@ client.on('raw', async rawPacket => {
         // fetch('https://porofessor.gg/live/na/R%C3%ADenfleche').then(resp => resp.text().then(console.log))
 
 
-        const gameType = doc.querySelector('.left.relative').textContent.trim().split('\n')[0] || "?"
+        const gameType = document.querySelector('.left.relative').textContent.trim().split('\n')[0] || "?"
         const playerNames = [
-            ...[...doc.querySelectorAll('.cardHeader.blue a')].map(e => e.textContent.trim()),
-            ...[...doc.querySelectorAll('.cardHeader.red a')].map(e => e.textContent.trim()),
+            ...[...document.querySelectorAll('.cardHeader.blue a')].map(e => e.textContent.trim()),
+            ...[...document.querySelectorAll('.cardHeader.red a')].map(e => e.textContent.trim()),
         ]
-        const champions = [...doc.querySelectorAll('div.imgColumn-champion > img')].map(e => e.title)
-        const winrate = [...doc.querySelectorAll('.title.oneLiner')].map(e => e.textContent.trim().split('  ').filter(e => e.length > 0))
-        const ranks = [...doc.querySelectorAll('.highBoxHeight.relative > img')].map(e => e.title)
-        const rankedGamesRaw = [...doc.querySelectorAll('.rankingsBox.canExpand .imgFlex:first-of-type .oneLiner')].map(e => e.textContent.trim().split('  ').filter(e => e.length > 0 && e != "\n"))
-        const mainRoles = [...doc.querySelectorAll('.rolesBox .highlight')].map(e => e.textContent.trim())
-        const kda = [...doc.querySelectorAll('div.championsBoxContainer > div > div.imgFlex > div.txt > div.content > div:nth-child(1)')].map(e => e.textContent.replace(/\s/g, ''))
+        const champions = [...document.querySelectorAll('div.imgColumn-champion > img')].map(e => e.title)
+        const winrate = [...document.querySelectorAll('.title.oneLiner')].map(e => e.textContent.trim().split('  ').filter(e => e.length > 0))
+        const ranks = [...document.querySelectorAll('.highBoxHeight.relative > img')].map(e => e.title)
+        const rankedGamesRaw = [...document.querySelectorAll('.rankingsBox.canExpand .imgFlex:first-of-type .oneLiner')].map(e => e.textContent.trim().split('  ').filter(e => e.length > 0 && e != "\n"))
+        const mainRoles = [...document.querySelectorAll('.rolesBox .highlight')].map(e => e.textContent.trim())
+        const kda = [...document.querySelectorAll('div.championsBoxContainer > div > div.imgFlex > div.txt > div.content > div:nth-child(1)')].map(e => e.textContent.replace(/\s/g, ''))
         if (recentGames.includes(users[userID])) return
         recentGames = [...recentGames, ...playerNames]
         setTimeout(() => {
@@ -74,12 +74,12 @@ client.on('raw', async rawPacket => {
             if (ranks[i] == "Unranked") {
                 rankedGames[i] = null
             } else {
-                rankedGames[i] = rankedGamesRaw.shift()
+                rankedGames[i] = rankedGamesRaw[1]
             }
         }
 
         const playerIndex = playerNames.indexOf(player)
-        const premades = [...doc.querySelectorAll('.premadeTag ')].map(e => ([e.parentNode.children[2] ? e.parentNode.children[1].textContent.trim() : e.parentNode.children[0].textContent.trim(), e.textContent.trim()]))
+        const premades = [...document.querySelectorAll('.premadeTag ')].map(e => ([e.parentNode.children[2] ? e.parentNode.children[1].textContent.trim() : e.parentNode.children[0].textContent.trim(), e.textContent.trim()]))
 
         const premadeColors = ["#00ff00", '#ff00ff', '#ffff00', '#00ffff', '#ff00ff', '#ffffff']
         let premadeMapper = {}
