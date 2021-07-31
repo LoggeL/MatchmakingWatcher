@@ -18,25 +18,75 @@ const prefix = '!!'
 let recentGames = []
 
 client.on('ready', () => {
-    console.log('Bot online')
+    console.log(client.user.tag, 'online')
 })
 
 
 client.on('raw', async rawPacket => {
-    if (rawPacket.t !== 'PRESENCE_UPDATE') return
-    const userID = rawPacket.d.user.id
-    const activity = rawPacket.d.activities.find(a => a.name === "League of Legends")
-    if (!users[userID]) return
-    let player = users[userID]
-    if (!activity) return
-    if (!activity || !activity.timestamps) return
-    if (new Date() - activity.timestamps.start > 10000) return
-    if (activity.name != 'League of Legends' || !gameStrings.includes(activity.state)) return
-    if (activity.details.includes('Teamfight Tactics')) return
-    if (recentGames.includes(player)) return
-    console.log("Fetching data for " + player, activity)
+    if (rawPacket.t === 'MESSAGE_CREATE') {
+        const message = rawPacket.d
+        if (message.author.bot) return
+        if (message.content.startsWith(prefix)) {
+            const args = message.content.split(' ')
+            const command = args.shift().slice(prefix.length)
+            console.log(command, args)
+            switch (command) {
+                case 'help':
+                    channelSend(message.channel_id, 'No')
+                    return
+                case 'ping':
+                    channelSend(message.channel_id, 'Pong!')
+                    return
+                case 'add':
+                    if (users[message.author.id]) return channelSend(message.channel_id, 'Already in Database as ', users[message.author.id])
+                    if (args.length == 0) {
+                        channelSend(message.channel_id, 'No player name provided')
+                        return
+                    }
+                    const player = args.join(' ')
+                    const response = await fetch(`https://www.leagueofgraphs.com/summoner/euw/${player}`)
+                    if (response.status == 404) {
+                        channelSend(message.channel_id, 'Player not found')
+                        return
+                    }
+                    users[message.author.id] = player
+                    fs.writeFileSync('./users.json', JSON.stringify(users, null, 2))
+                    channelSend(message.channel_id, `${player} added`)
+                    return
+                case 'remove':
+                    console.log(users[message.author.id], message.author.id)
+                    if (!users[message.author.id]) return channelSend(message.channel_id, 'User not in Database')
+                    channelSend(message.channel_id, `${users[message.author.id]} removed`)
+                    delete users[message.author.id]
+                    fs.writeFileSync('./users.json', JSON.stringify(users, null, 2))
+                    return
+                case 'trigger':
+                    if (!users[message.author.id]) return channelSend(message.channel_id, 'User not in Database')
+                    fetchPlayer(users[message.author.id], message.author.id)
+                    return
+            }
+        }
+    } else if (rawPacket.t === 'PRESENCE_UPDATE') {
+        const userID = rawPacket.d.user.id
+        const activity = rawPacket.d.activities.find(a => a.name === "League of Legends")
+        if (!users[userID]) return
+        let player = users[userID]
+        if (!activity) return
+        if (!activity || !activity.timestamps) return
+        if (new Date() - activity.timestamps.start > 10000) return
+        if (activity.name != 'League of Legends' || !gameStrings.includes(activity.state)) return
+        if (activity.details.includes('Teamfight Tactics')) return
+        if (recentGames.includes(player)) return
+        console.log("Fetching data for " + player, activity)
+        fetchPlayer(player, userID)
+    }
+})
 
+function channelSend(channel, message) {
+    client.channels.fetch(channel).then(ch => ch.send(message))
+}
 
+function fetchPlayer(player, userID) {
     JSDOM.fromURL(`https://porofessor.gg/partial/live-partial/${server}/${encodeURIComponent(player)}`).then(async dom => {
         //JSDOM.fromFile('prof.html').then(async dom => {
 
@@ -234,8 +284,7 @@ client.on('raw', async rawPacket => {
                 console.log("Message Sent!")
             }))
     }).catch(console.error)
-
-})
+}
 
 client.login(config.token)
 
