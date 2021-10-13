@@ -17,8 +17,18 @@ const server = "euw"
 const prefix = '!!'
 let recentGames = []
 
-client.on('ready', () => {
+let championsJSON
+let versions
+
+client.on('ready', async () => {
     console.log(client.user.tag, 'online')
+
+    let r = await fetch(`https://ddragon.leagueoflegends.com/api/versions.json`)
+    versions = await r.json()
+
+    let r = await fetch(`https://ddragon.leagueoflegends.com/cdn/${versions[0]}/data/en_US/champion.json`)
+    championsJSON = await r.json()
+
 })
 
 
@@ -38,7 +48,7 @@ client.on('raw', async rawPacket => {
                     channelSend(message.channel_id, 'Pong!')
                     return
                 case 'add':
-                    if (users[message.author.id]) return channelSend(message.channel_id, 'Already in Database as ', users[message.author.id])
+                    if (users[message.author.id]) return channelSend(message.channel_id, 'Already in Database as', users[message.author.id])
                     if (args.length == 0) {
                         channelSend(message.channel_id, 'No player name provided')
                         return
@@ -92,7 +102,7 @@ function fetchPlayer(player, userID) {
 
         const document = dom.window.document
 
-        const championsJSON = require('./champions.json')
+        // const championsJSON = require('./champions.json')
         let championMapper = {}
         for (key in championsJSON.data) {
             championMapper[championsJSON.data[key].name] = key
@@ -175,10 +185,12 @@ function fetchPlayer(player, userID) {
             const j = indexOffset ? (i + 5 >= 10 ? i - 5 : i + 5) : i
             const offset = i >= 5 ? 340 : 0
 
-            const heroPic = await Canvas.loadImage(__dirname +
-                `/champions/${championMapper[champions[j]]}.png`
-            )
-            ctx.drawImage(heroPic, 25 + offset, k * 49 + 50, 40, 40)
+            if (championMapper[champions[j]]) {
+                const heroPic = await Canvas.loadImage(__dirname +
+                    `/champions/${championMapper[champions[j]]}.png`
+                )
+                ctx.drawImage(heroPic, 25 + offset, k * 49 + 50, 40, 40)
+            }
 
             // Premade Outlines
             const premadeColor = premadeMapper[playerNames[j]]
