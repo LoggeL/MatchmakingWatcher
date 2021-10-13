@@ -15,6 +15,7 @@ const jimp = require('jimp')
     let promises = []
     for (i in names) {
         const name = names[i]
+        console.log(name)
         promises.push(
             fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/img/champion/${name}.png`).then(img => {
                 img.body.pipe(fs.createWriteStream(`champions/${name}.png`))

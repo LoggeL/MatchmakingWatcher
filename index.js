@@ -117,7 +117,7 @@ function fetchPlayer(player, userID) {
             ...[...document.querySelectorAll('.cardHeader.blue a')].map(e => e.textContent.trim()),
             ...[...document.querySelectorAll('.cardHeader.red a')].map(e => e.textContent.trim()),
         ]
-        const champions = [...document.querySelectorAll('div.imgColumn-champion > img')].map(e => e.title)
+        const champions = [...document.querySelectorAll('div.imgColumn-champion .relative img')].map(e => e.title)
         const winrate = [...document.querySelectorAll('.title.oneLiner')].map(e => e.textContent.trim().split('  ').filter(e => e.length > 0))
         const ranks = [...document.querySelectorAll('.highBoxHeight.relative > img')].map(e => e.title)
         const rankedGamesRaw = [...document.querySelectorAll('.rankingsBox.canExpand .imgFlex:first-of-type .oneLiner')].map(e => e.textContent.trim().split('  ').filter(e => e.length > 0 && e != "\n"))
