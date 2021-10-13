@@ -26,7 +26,7 @@ client.on('ready', async () => {
     let r = await fetch(`https://ddragon.leagueoflegends.com/api/versions.json`)
     versions = await r.json()
 
-    let r = await fetch(`https://ddragon.leagueoflegends.com/cdn/${versions[0]}/data/en_US/champion.json`)
+    r = await fetch(`https://ddragon.leagueoflegends.com/cdn/${versions[0]}/data/en_US/champion.json`)
     championsJSON = await r.json()
 
 })
