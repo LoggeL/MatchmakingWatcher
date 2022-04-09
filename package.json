@@ -11,9 +11,6 @@
   "dependencies": {
     "canvas": "^2.8.0",
     "discord.js": "github:discordjs/discord.js",
-    "domhandler": "^4.0.0",
-    "jimp": "^0.9.8",
-    "jsdom": "^16.5.2",
-    "node-fetch": "^2.6.1"
+    "jsdom": "^16.5.2"
   }
 }
